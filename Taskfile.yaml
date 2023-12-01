@@ -5,6 +5,10 @@ tasks:
     cmds:
       - go build -v -i main.go
 
+  clean:
+    cmds:
+      - rm -rf build
+
   gen:
     cmds:
       - solc --evm-version paris --abi --bin ./contracts/CommitReveal.sol -o build --overwrite
@@ -14,9 +18,19 @@ tasks:
         --bin=./build/CommitReveal.bin
         --pkg contracts
         --type CommitReveal
+      - task: dev-buf-mod
+      - buf lint proto
+      - buf generate
+      - go mod tidy
+
+  dev-buf-mod:
+    dir: ./proto
+    cmds:
+      - buf mod update
 
   dev-mac:
     cmds:
       - brew tap ethereum/ethereum
       - brew install solidity
       - brew install ethereum
+      - brew install bufbuild/buf/buf

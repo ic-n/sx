@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package commitreveal.v1;
+
+import "google/api/annotations.proto";
+
+message HealthResponse {
+  bool ok = 1;
+}
+
+message HealthRequest {};
+
+service CommitRevealService {
+  rpc Health(HealthRequest) returns (HealthResponse) {
+    option (google.api.http) = { get: "/v1/health" };
+  }
+}
