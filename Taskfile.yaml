@@ -7,7 +7,7 @@ tasks:
 
   gen:
     cmds:
-      - solc --abi --bin ./contracts/CommitReveal.sol -o build --overwrite
+      - solc --evm-version paris --abi --bin ./contracts/CommitReveal.sol -o build --overwrite
       - >
         abigen --out ./contracts/commit_reveal.go
         --abi ./build/CommitReveal.abi

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity 0.8.23;
+pragma solidity >=0.8.19;
 
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
