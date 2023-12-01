@@ -33,7 +33,7 @@ message GetPollResponse {
 
 message CommitRequest {
   string address = 1;
-  string secret_hash = 2;
+  string secret = 3;
 }
 
 message CommitResponse {
@@ -42,7 +42,6 @@ message CommitResponse {
 
 message RevealRequest {
   string address = 1;
-  string secret_hash = 2;
   string secret = 3;
 }
 

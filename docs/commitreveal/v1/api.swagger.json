@@ -41,7 +41,7 @@
             "type": "string"
           },
           {
-            "name": "secretHash",
+            "name": "secret",
             "in": "query",
             "required": false,
             "type": "string"
@@ -158,12 +158,6 @@
         "parameters": [
           {
             "name": "address",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "secretHash",
             "in": "query",
             "required": false,
             "type": "string"
