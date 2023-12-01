@@ -1,0 +1,31 @@
+{
+  "name": "web3-engineering-assignment",
+  "version": "1.0.0",
+  "description": "An assignment for prospective web3 engineers @ SX.bet",
+  "main": "\"\"",
+  "dependencies": {
+    "@typechain/ethers-v6": "^0.5.1",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "ethers": "^6.8.1"
+  },
+  "scripts": {
+    "test": "hardhat test",
+    "compile": "tsc",
+    "typechain": "hardhat typechain",
+    "deploy": "hardhat run scripts/deploy.ts --network localhost"
+  },
+  "author": "Dan Kostiuk <daniel@nextgenbt.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.2",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.9",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@typechain/hardhat": "^9.1.0",
+    "@types/chai": "^4.3.11",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.10.0",
+    "hardhat": "^2.19.1",
+    "typechain": "^8.3.2"
+  }
+}
