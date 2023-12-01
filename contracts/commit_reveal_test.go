@@ -3,9 +3,9 @@ package contracts
 import (
 	"fmt"
 	"math/big"
-	"strings"
 	"time"
 
+	"github.com/ic-n/sx/pkg/tools"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -29,14 +29,14 @@ var _ = Describe("Contract test", Label("sol"), func() {
 	})
 
 	It("should record a proper commit", func(ctx SpecContext) {
-		vote := b32("1~mybigsecret")
+		vote := tools.B32("1~mybigsecret")
 		_, err := c.CommitVote(auth, vote)
 		Expect(err).NotTo(HaveOccurred())
 		cli.Commit()
 
 		data, err := c.GetVoteCommitsArray(nil)
 		Expect(err).NotTo(HaveOccurred())
-		Expect(unb32(data[0])).Should(Equal("1~mybigsecret"))
+		Expect(tools.UnB32(data[0])).Should(Equal("1~mybigsecret"))
 
 		voteStatus, err := c.VoteStatuses(nil, vote)
 		Expect(err).NotTo(HaveOccurred())
@@ -88,7 +88,7 @@ var _ = Describe("Contract test", Label("sol"), func() {
 
 	It("should not record an incorrect reveal", func(ctx SpecContext) {
 		const badVote = "3~mybigsecret"
-		_, err := c.CommitVote(auth, b32(badVote))
+		_, err := c.CommitVote(auth, tools.B32(badVote))
 		Expect(err).NotTo(HaveOccurred())
 		cli.Commit()
 
@@ -96,7 +96,7 @@ var _ = Describe("Contract test", Label("sol"), func() {
 		Expect(err).NotTo(HaveOccurred())
 		cli.Commit()
 
-		tx, err := c.RevealVote(auth, badVote, b32(badVote))
+		tx, err := c.RevealVote(auth, badVote, tools.B32(badVote))
 		Expect(err).To(MatchError("execution reverted: Vote hash does not match vote commit."))
 		Expect(tx).To(BeNil())
 	})
@@ -121,27 +121,6 @@ var _ = Describe("Contract test", Label("sol"), func() {
 	})
 })
 
-func b32(s string) [32]byte {
-	v := [32]byte{}
-	copy(v[:], []byte(s))
-	return v
-}
-
-func unb32(v [32]byte) string {
-	return strings.TrimRight(string(v[:]), "\x00")
-}
-
-func wei(eth float64) *big.Int {
-	weiMultiplier := new(big.Int)
-	weiMultiplier.Exp(big.NewInt(10), big.NewInt(18), nil)
-
-	ethInWei := new(big.Float).Mul(big.NewFloat(eth), new(big.Float).SetInt(weiMultiplier))
-	wei := new(big.Int)
-	ethInWei.Int(wei)
-
-	return wei
-}
-
 const (
 	simChainID = 1337
 	gasLim     = 4712388
@@ -159,7 +138,7 @@ func testContract() (*bind.TransactOpts, *backends.SimulatedBackend, *CommitReve
 		return nil, nil, nil, fmt.Errorf("failed to create transactor: %w", err)
 	}
 	alloc := make(core.GenesisAlloc)
-	alloc[auth.From] = core.GenesisAccount{Balance: wei(1000)}
+	alloc[auth.From] = core.GenesisAccount{Balance: tools.Wei(1000)}
 	client := backends.NewSimulatedBackend(alloc, gasLim)
 
 	_, _, contract, err := DeployCommitReveal(auth, client, big.NewInt(phaseSeconds), "YES", "NO")
