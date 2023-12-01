@@ -7,8 +7,13 @@ tasks:
 
   gen:
     cmds:
-      - solc --abi ./contracts/CommitReveal.sol -o build --overwrite
-      - abigen --abi ./build/CommitReveal.abi --pkg contracts --type CommitReveal --out ./contracts/commit_reveal.go
+      - solc --abi --bin ./contracts/CommitReveal.sol -o build --overwrite
+      - >
+        abigen --out ./contracts/commit_reveal.go
+        --abi ./build/CommitReveal.abi
+        --bin=./build/CommitReveal.bin
+        --pkg contracts
+        --type CommitReveal
 
   dev-mac:
     cmds:
