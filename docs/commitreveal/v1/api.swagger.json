@@ -16,6 +16,42 @@
     "application/json"
   ],
   "paths": {
+    "/v1/commit": {
+      "post": {
+        "operationId": "CommitRevealService_Commit",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CommitResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "address",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "secretHash",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CommitRevealService"
+        ]
+      }
+    },
     "/v1/health": {
       "get": {
         "operationId": "CommitRevealService_Health",
@@ -33,6 +69,112 @@
             }
           }
         },
+        "tags": [
+          "CommitRevealService"
+        ]
+      }
+    },
+    "/v1/poll": {
+      "get": {
+        "operationId": "CommitRevealService_GetPoll",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetPollResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "address",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CommitRevealService"
+        ]
+      },
+      "post": {
+        "operationId": "CommitRevealService_CreatePoll",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreatePollResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "choice1",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "choice2",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CommitRevealService"
+        ]
+      }
+    },
+    "/v1/reveal": {
+      "post": {
+        "operationId": "CommitRevealService_Reveal",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1RevealResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "address",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "secretHash",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "secret",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "tags": [
           "CommitRevealService"
         ]
@@ -68,7 +210,54 @@
         }
       }
     },
+    "v1CommitResponse": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1CreatePollResponse": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetPollResponse": {
+      "type": "object",
+      "properties": {
+        "secondsLeft": {
+          "type": "string",
+          "format": "int64"
+        },
+        "choice1": {
+          "type": "string"
+        },
+        "choice2": {
+          "type": "string"
+        },
+        "count1": {
+          "type": "string",
+          "format": "int64"
+        },
+        "count2": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
     "v1HealthResponse": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1RevealResponse": {
       "type": "object",
       "properties": {
         "ok": {

@@ -4,9 +4,49 @@ package commitreveal.v1;
 
 import "google/api/annotations.proto";
 
-message HealthRequest {};
+message HealthRequest {}
 
 message HealthResponse {
+  bool ok = 1;
+}
+
+message CreatePollRequest {
+  string choice_1 = 1;
+  string choice_2 = 2;
+}
+
+message CreatePollResponse {
+  string address = 1;
+}
+
+message GetPollRequest {
+  string address = 1;
+}
+
+message GetPollResponse {
+  int64 seconds_left = 1;
+  string choice_1 = 2;
+  string choice_2 = 3;
+  int64 count_1 = 4;
+  int64 count_2 = 5;
+}
+
+message CommitRequest {
+  string address = 1;
+  string secret_hash = 2;
+}
+
+message CommitResponse {
+  bool ok = 1;
+}
+
+message RevealRequest {
+  string address = 1;
+  string secret_hash = 2;
+  string secret = 3;
+}
+
+message RevealResponse {
   bool ok = 1;
 }
 
@@ -15,16 +55,19 @@ service CommitRevealService {
     option (google.api.http) = { get: "/v1/health" };
   }
 
-  // Create Poll (choice1, choice2)
-  //    -> address
-  // Get Poll (address)
-  //    -> seconds_left
-  //    -> choice1
-  //    -> choice2
-  //    -> count1?
-  //    -> count2?
-  // Vote (address, secret)
-  //    -> ok
-  // Reveal (address, text)
-  //    -> ok
+  rpc CreatePoll(CreatePollRequest) returns (CreatePollResponse) {
+    option (google.api.http) = { post: "/v1/poll" };
+  }
+
+  rpc GetPoll(GetPollRequest) returns (GetPollResponse) {
+    option (google.api.http) = { get: "/v1/poll" };
+  }
+
+  rpc Commit(CommitRequest) returns (CommitResponse) {
+    option (google.api.http) = { post: "/v1/commit" };
+  }
+
+  rpc Reveal(RevealRequest) returns (RevealResponse) {
+    option (google.api.http) = { post: "/v1/reveal" };
+  }
 }

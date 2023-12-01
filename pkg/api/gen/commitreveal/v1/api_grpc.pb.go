@@ -19,7 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	CommitRevealService_Health_FullMethodName = "/commitreveal.v1.CommitRevealService/Health"
+	CommitRevealService_Health_FullMethodName     = "/commitreveal.v1.CommitRevealService/Health"
+	CommitRevealService_CreatePoll_FullMethodName = "/commitreveal.v1.CommitRevealService/CreatePoll"
+	CommitRevealService_GetPoll_FullMethodName    = "/commitreveal.v1.CommitRevealService/GetPoll"
+	CommitRevealService_Commit_FullMethodName     = "/commitreveal.v1.CommitRevealService/Commit"
+	CommitRevealService_Reveal_FullMethodName     = "/commitreveal.v1.CommitRevealService/Reveal"
 )
 
 // CommitRevealServiceClient is the client API for CommitRevealService service.
@@ -27,6 +31,10 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CommitRevealServiceClient interface {
 	Health(ctx context.Context, in *HealthRequest, opts ...grpc.CallOption) (*HealthResponse, error)
+	CreatePoll(ctx context.Context, in *CreatePollRequest, opts ...grpc.CallOption) (*CreatePollResponse, error)
+	GetPoll(ctx context.Context, in *GetPollRequest, opts ...grpc.CallOption) (*GetPollResponse, error)
+	Commit(ctx context.Context, in *CommitRequest, opts ...grpc.CallOption) (*CommitResponse, error)
+	Reveal(ctx context.Context, in *RevealRequest, opts ...grpc.CallOption) (*RevealResponse, error)
 }
 
 type commitRevealServiceClient struct {
@@ -46,11 +54,51 @@ func (c *commitRevealServiceClient) Health(ctx context.Context, in *HealthReques
 	return out, nil
 }
 
+func (c *commitRevealServiceClient) CreatePoll(ctx context.Context, in *CreatePollRequest, opts ...grpc.CallOption) (*CreatePollResponse, error) {
+	out := new(CreatePollResponse)
+	err := c.cc.Invoke(ctx, CommitRevealService_CreatePoll_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *commitRevealServiceClient) GetPoll(ctx context.Context, in *GetPollRequest, opts ...grpc.CallOption) (*GetPollResponse, error) {
+	out := new(GetPollResponse)
+	err := c.cc.Invoke(ctx, CommitRevealService_GetPoll_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *commitRevealServiceClient) Commit(ctx context.Context, in *CommitRequest, opts ...grpc.CallOption) (*CommitResponse, error) {
+	out := new(CommitResponse)
+	err := c.cc.Invoke(ctx, CommitRevealService_Commit_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *commitRevealServiceClient) Reveal(ctx context.Context, in *RevealRequest, opts ...grpc.CallOption) (*RevealResponse, error) {
+	out := new(RevealResponse)
+	err := c.cc.Invoke(ctx, CommitRevealService_Reveal_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CommitRevealServiceServer is the server API for CommitRevealService service.
 // All implementations must embed UnimplementedCommitRevealServiceServer
 // for forward compatibility
 type CommitRevealServiceServer interface {
 	Health(context.Context, *HealthRequest) (*HealthResponse, error)
+	CreatePoll(context.Context, *CreatePollRequest) (*CreatePollResponse, error)
+	GetPoll(context.Context, *GetPollRequest) (*GetPollResponse, error)
+	Commit(context.Context, *CommitRequest) (*CommitResponse, error)
+	Reveal(context.Context, *RevealRequest) (*RevealResponse, error)
 	mustEmbedUnimplementedCommitRevealServiceServer()
 }
 
@@ -60,6 +108,18 @@ type UnimplementedCommitRevealServiceServer struct {
 
 func (UnimplementedCommitRevealServiceServer) Health(context.Context, *HealthRequest) (*HealthResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Health not implemented")
+}
+func (UnimplementedCommitRevealServiceServer) CreatePoll(context.Context, *CreatePollRequest) (*CreatePollResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePoll not implemented")
+}
+func (UnimplementedCommitRevealServiceServer) GetPoll(context.Context, *GetPollRequest) (*GetPollResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPoll not implemented")
+}
+func (UnimplementedCommitRevealServiceServer) Commit(context.Context, *CommitRequest) (*CommitResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Commit not implemented")
+}
+func (UnimplementedCommitRevealServiceServer) Reveal(context.Context, *RevealRequest) (*RevealResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Reveal not implemented")
 }
 func (UnimplementedCommitRevealServiceServer) mustEmbedUnimplementedCommitRevealServiceServer() {}
 
@@ -92,6 +152,78 @@ func _CommitRevealService_Health_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CommitRevealService_CreatePoll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePollRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommitRevealServiceServer).CreatePoll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommitRevealService_CreatePoll_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommitRevealServiceServer).CreatePoll(ctx, req.(*CreatePollRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CommitRevealService_GetPoll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPollRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommitRevealServiceServer).GetPoll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommitRevealService_GetPoll_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommitRevealServiceServer).GetPoll(ctx, req.(*GetPollRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CommitRevealService_Commit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CommitRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommitRevealServiceServer).Commit(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommitRevealService_Commit_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommitRevealServiceServer).Commit(ctx, req.(*CommitRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CommitRevealService_Reveal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RevealRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommitRevealServiceServer).Reveal(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommitRevealService_Reveal_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommitRevealServiceServer).Reveal(ctx, req.(*RevealRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CommitRevealService_ServiceDesc is the grpc.ServiceDesc for CommitRevealService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +234,22 @@ var CommitRevealService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Health",
 			Handler:    _CommitRevealService_Health_Handler,
+		},
+		{
+			MethodName: "CreatePoll",
+			Handler:    _CommitRevealService_CreatePoll_Handler,
+		},
+		{
+			MethodName: "GetPoll",
+			Handler:    _CommitRevealService_GetPoll_Handler,
+		},
+		{
+			MethodName: "Commit",
+			Handler:    _CommitRevealService_Commit_Handler,
+		},
+		{
+			MethodName: "Reveal",
+			Handler:    _CommitRevealService_Reveal_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
