@@ -21,53 +21,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type HealthResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Ok bool `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
-}
-
-func (x *HealthResponse) Reset() {
-	*x = HealthResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_commitreveal_v1_api_proto_msgTypes[0]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *HealthResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*HealthResponse) ProtoMessage() {}
-
-func (x *HealthResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_commitreveal_v1_api_proto_msgTypes[0]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use HealthResponse.ProtoReflect.Descriptor instead.
-func (*HealthResponse) Descriptor() ([]byte, []int) {
-	return file_commitreveal_v1_api_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *HealthResponse) GetOk() bool {
-	if x != nil {
-		return x.Ok
-	}
-	return false
-}
-
 type HealthRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -77,7 +30,7 @@ type HealthRequest struct {
 func (x *HealthRequest) Reset() {
 	*x = HealthRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_commitreveal_v1_api_proto_msgTypes[1]
+		mi := &file_commitreveal_v1_api_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -90,7 +43,7 @@ func (x *HealthRequest) String() string {
 func (*HealthRequest) ProtoMessage() {}
 
 func (x *HealthRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_commitreveal_v1_api_proto_msgTypes[1]
+	mi := &file_commitreveal_v1_api_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -103,7 +56,54 @@ func (x *HealthRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HealthRequest.ProtoReflect.Descriptor instead.
 func (*HealthRequest) Descriptor() ([]byte, []int) {
+	return file_commitreveal_v1_api_proto_rawDescGZIP(), []int{0}
+}
+
+type HealthResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Ok bool `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+}
+
+func (x *HealthResponse) Reset() {
+	*x = HealthResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_commitreveal_v1_api_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *HealthResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HealthResponse) ProtoMessage() {}
+
+func (x *HealthResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_commitreveal_v1_api_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HealthResponse.ProtoReflect.Descriptor instead.
+func (*HealthResponse) Descriptor() ([]byte, []int) {
 	return file_commitreveal_v1_api_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *HealthResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
 }
 
 var File_commitreveal_v1_api_proto protoreflect.FileDescriptor
@@ -113,10 +113,10 @@ var file_commitreveal_v1_api_proto_rawDesc = []byte{
 	0x31, 0x2f, 0x61, 0x70, 0x69, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0f, 0x63, 0x6f, 0x6d,
 	0x6d, 0x69, 0x74, 0x72, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x2e, 0x76, 0x31, 0x1a, 0x1c, 0x67, 0x6f,
 	0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x6e, 0x6e, 0x6f, 0x74, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x20, 0x0a, 0x0e, 0x48, 0x65,
-	0x61, 0x6c, 0x74, 0x68, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02,
-	0x6f, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x02, 0x6f, 0x6b, 0x22, 0x0f, 0x0a, 0x0d,
-	0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x32, 0x74, 0x0a,
+	0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x0f, 0x0a, 0x0d, 0x48, 0x65,
+	0x61, 0x6c, 0x74, 0x68, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x20, 0x0a, 0x0e, 0x48,
+	0x65, 0x61, 0x6c, 0x74, 0x68, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a,
+	0x02, 0x6f, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x02, 0x6f, 0x6b, 0x32, 0x74, 0x0a,
 	0x13, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x52, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x53, 0x65, 0x72,
 	0x76, 0x69, 0x63, 0x65, 0x12, 0x5d, 0x0a, 0x06, 0x48, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x12, 0x1e,
 	0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x72, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x2e, 0x76, 0x31,
@@ -153,12 +153,12 @@ func file_commitreveal_v1_api_proto_rawDescGZIP() []byte {
 
 var file_commitreveal_v1_api_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_commitreveal_v1_api_proto_goTypes = []interface{}{
-	(*HealthResponse)(nil), // 0: commitreveal.v1.HealthResponse
-	(*HealthRequest)(nil),  // 1: commitreveal.v1.HealthRequest
+	(*HealthRequest)(nil),  // 0: commitreveal.v1.HealthRequest
+	(*HealthResponse)(nil), // 1: commitreveal.v1.HealthResponse
 }
 var file_commitreveal_v1_api_proto_depIdxs = []int32{
-	1, // 0: commitreveal.v1.CommitRevealService.Health:input_type -> commitreveal.v1.HealthRequest
-	0, // 1: commitreveal.v1.CommitRevealService.Health:output_type -> commitreveal.v1.HealthResponse
+	0, // 0: commitreveal.v1.CommitRevealService.Health:input_type -> commitreveal.v1.HealthRequest
+	1, // 1: commitreveal.v1.CommitRevealService.Health:output_type -> commitreveal.v1.HealthResponse
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -173,7 +173,7 @@ func file_commitreveal_v1_api_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_commitreveal_v1_api_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*HealthResponse); i {
+			switch v := v.(*HealthRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -185,7 +185,7 @@ func file_commitreveal_v1_api_proto_init() {
 			}
 		}
 		file_commitreveal_v1_api_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*HealthRequest); i {
+			switch v := v.(*HealthResponse); i {
 			case 0:
 				return &v.state
 			case 1:

@@ -4,14 +4,25 @@ package commitreveal.v1;
 
 import "google/api/annotations.proto";
 
+message HealthRequest {};
+
 message HealthResponse {
   bool ok = 1;
 }
 
-message HealthRequest {};
+// message StatusRequest {};
+
+// message StatusResponse {
+//   google.protobuf.Timestamp voteUntil = 1;
+//   int64 votes = 2;
+// }
 
 service CommitRevealService {
   rpc Health(HealthRequest) returns (HealthResponse) {
     option (google.api.http) = { get: "/v1/health" };
   }
+
+  // rpc Status(StatusRequest) returns (StatusResponse) {
+  //   option (google.api.http) = { get: "/v1/status" };
+  // }
 }
