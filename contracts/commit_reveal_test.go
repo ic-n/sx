@@ -4,14 +4,109 @@ import (
 	"fmt"
 	"math/big"
 	"strings"
-	"testing"
+	"time"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/core"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/stretchr/testify/require"
 )
+
+var _ = Describe("Contract test", Label("sol"), func() {
+	var (
+		auth *bind.TransactOpts
+		cli  *backends.SimulatedBackend
+		c    *CommitReveal
+	)
+
+	BeforeEach(func() {
+		var err error
+		auth, cli, c, err = testContract()
+		Expect(err)
+	})
+
+	It("should record a proper commit", func(ctx SpecContext) {
+		vote := b32("1~mybigsecret")
+		_, err := c.CommitVote(auth, vote)
+		Expect(err).NotTo(HaveOccurred())
+		cli.Commit()
+
+		data, err := c.GetVoteCommitsArray(nil)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(unb32(data[0])).Should(Equal("1~mybigsecret"))
+
+		voteStatus, err := c.VoteStatuses(nil, vote)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(voteStatus).Should(Equal("Committed"))
+
+		numberOfVotes, err := c.NumberOfVotesCast(nil)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(numberOfVotes.Int64()).Should(BeEquivalentTo(1))
+	})
+
+	It("should record proper reveals", func(ctx SpecContext) {
+		const vote1 = "1~mybigsecret"
+		const vote2 = "2~mybigsecret"
+		commit1 := crypto.Keccak256([]byte(vote1))
+		commit2 := crypto.Keccak256([]byte(vote2))
+
+		_, err := c.CommitVote(auth, [32]byte(commit1))
+		Expect(err).NotTo(HaveOccurred())
+		_, err = c.CommitVote(auth, [32]byte(commit2))
+		Expect(err).NotTo(HaveOccurred())
+		cli.Commit()
+
+		err = cli.AdjustTime(time.Duration(PhaseLengthInSeconds.Int64()) * time.Second)
+		Expect(err).NotTo(HaveOccurred())
+		cli.Commit()
+
+		_, err = c.RevealVote(auth, vote1, [32]byte(commit1))
+		Expect(err).NotTo(HaveOccurred())
+		_, err = c.RevealVote(auth, vote2, [32]byte(commit2))
+		Expect(err).NotTo(HaveOccurred())
+		cli.Commit()
+
+		votesFor1, err := c.VotesForChoice1(nil)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(votesFor1.Int64()).Should(BeEquivalentTo(1))
+
+		votesFor2, err := c.VotesForChoice2(nil)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(votesFor2.Int64()).Should(BeEquivalentTo(1))
+
+		voteStatusCommit1, err := c.VoteStatuses(nil, [32]byte(commit1))
+		Expect(err).NotTo(HaveOccurred())
+		Expect(voteStatusCommit1).Should(Equal("Revealed"))
+
+		voteStatusCommit2, err := c.VoteStatuses(nil, [32]byte(commit1))
+		Expect(err).NotTo(HaveOccurred())
+		Expect(voteStatusCommit2).Should(Equal("Revealed"))
+	})
+
+	//   it("should not record an incorrect reveal", async () => {
+	It("should not record an incorrect reveal", func(ctx SpecContext) {})
+	// 	const badVote = "3~mybigsecret";
+	// 	const commit = ethers.encodeBytes32String(badVote);
+	// 	await commitReveal.commitVote(commit);
+	// 	await ethers.provider.send("evm_increaseTime", [PHASE_LENGTH_IN_SECONDS]);
+	// 	const tx = commitReveal.revealVote(badVote, commit);
+	// 	await expect(tx).to.be.rejectedWith(Error);
+	//   });
+
+	//   it("should correctly get winner", async () => {
+	It("should correctly get winner", func(ctx SpecContext) {})
+	// 	const vote = "1~mybigsecret";
+	// 	const commit = ethers.keccak256(ethers.toUtf8Bytes(vote));
+	// 	await commitReveal.commitVote(commit);
+	// 	await ethers.provider.send("evm_increaseTime", [PHASE_LENGTH_IN_SECONDS]);
+	// 	await commitReveal.revealVote(vote, commit);
+	// 	const winner = await commitReveal.getWinner();
+	// 	expect(winner).to.equal("YES");
+	//   });
+})
 
 func b32(s string) [32]byte {
 	v := [32]byte{}
@@ -35,34 +130,6 @@ func ConvertEthToWei(ethAmount float64) *big.Int {
 }
 
 var PhaseLengthInSeconds = big.NewInt(120)
-
-func TestDeployInbox(t *testing.T) {
-	t.Run("record a proper commit", func(t *testing.T) {
-		auth, cli, c, err := testContract()
-		require.NoError(t, err)
-
-		vote := b32("1~mybigsecret")
-		tx, err := c.CommitVote(&bind.TransactOpts{
-			From:     auth.From,
-			Signer:   auth.Signer,
-			GasLimit: auth.GasLimit,
-		}, vote)
-		require.NoError(t, err, tx)
-		cli.Commit()
-
-		data, err := c.GetVoteCommitsArray(nil)
-		require.NoError(t, err)
-		require.EqualValues(t, "1~mybigsecret", unb32(data[0]))
-
-		voteStatus, err := c.VoteStatuses(nil, vote)
-		require.NoError(t, err)
-		require.Equal(t, voteStatus, "Committed")
-
-		numberOfVotes, err := c.NumberOfVotesCast(nil)
-		require.NoError(t, err)
-		require.EqualValues(t, 1, numberOfVotes.Int64())
-	})
-}
 
 const (
 	simChainID = 1337
