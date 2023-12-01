@@ -4,3 +4,14 @@ tasks:
   build:
     cmds:
       - go build -v -i main.go
+
+  gen:
+    cmds:
+      - solc --abi ./contracts/CommitReveal.sol -o build --overwrite
+      - abigen --abi ./build/CommitReveal.abi --pkg contracts --type CommitReveal --out ./contracts/commit_reveal.go
+
+  dev-mac:
+    cmds:
+      - brew tap ethereum/ethereum
+      - brew install solidity
+      - brew install ethereum

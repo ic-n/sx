@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity 0.8.19;
+pragma solidity 0.8.23;
 
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 
 contract CommitReveal {
-    // The two choices for your vote. Note that these are just symbolic and for display purposes only. 
-    // In practice, the user 
+    // The two choices for your vote. Note that these are just symbolic and for display purposes only.
+    // In practice, the user
     string public choice1;
     string public choice2;
-    
+
     // Information about the current status of the vote
     uint256 public votesForChoice1;
     uint256 public votesForChoice2;
@@ -20,15 +20,15 @@ contract CommitReveal {
     // The actual votes and vote commits
     bytes32[] public voteCommits;
     mapping(bytes32 => string) public voteStatuses; // Either `Committed` or `Revealed`
-    
+
     // Events used to log what's going on in the contract
     event NewVoteCommit(bytes32 commit);
     event NewVoteReveal(bytes32 commit, string choice);
-    
+
     // Constructor used to set parameters for the this specific vote
     constructor(
-        uint256 _phaseLengthInSeconds, 
-        string memory _choice1, 
+        uint256 _phaseLengthInSeconds,
+        string memory _choice1,
         string memory _choice2
     ) {
         require(
@@ -63,7 +63,7 @@ contract CommitReveal {
         );
         _;
     }
-    
+
     function commitVote(bytes32 voteCommit) public onlyDuringCommitPhase {
         // Check if this commit has been used before
         bytes memory bytesVoteCommit = bytes(voteStatuses[voteCommit]);
@@ -71,7 +71,7 @@ contract CommitReveal {
             bytesVoteCommit.length == 0,
             "This commit has already been used"
         );
-        
+
         // We are still in the committing period & the commit is new so add it
         voteCommits.push(voteCommit);
         voteStatuses[voteCommit] = "Committed";
@@ -81,7 +81,7 @@ contract CommitReveal {
             voteCommit
         );
     }
-    
+
     function revealVote(string memory vote, bytes32 voteCommit) public {
         // FIRST: Verify the vote & commit is valid
         bytes memory bytesVoteStatus = bytes(voteStatuses[voteCommit]);
@@ -94,7 +94,7 @@ contract CommitReveal {
         if (voteCommit != keccak256(abi.encodePacked(vote))) {
             revert("Vote hash does not match vote commit.");
         }
-        
+
         // NEXT: Count the vote!
         bytes memory bytesVote = bytes(vote);
         if (bytesVote[0] == "1") {
@@ -108,14 +108,14 @@ contract CommitReveal {
         }
         voteStatuses[voteCommit] = "Revealed";
     }
-    
-    function getWinner() 
-        public 
-        view 
+
+    function getWinner()
+        public
+        view
         onlyAfterCommitPhase
-        onlyWhenAllVotesAreCounted 
-        returns (string memory winner) 
-    {    
+        onlyWhenAllVotesAreCounted
+        returns (string memory winner)
+    {
         if (votesForChoice1 > votesForChoice2) {
             return choice1;
         } else if (votesForChoice2 > votesForChoice1) {
