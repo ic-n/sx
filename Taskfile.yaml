@@ -51,6 +51,7 @@ tasks:
 
   clean:
     cmds:
+      - task: uninstall
       - rm -rf build
 
   gen:

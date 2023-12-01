@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"math/big"
 	"net/http"
-	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -17,11 +16,10 @@ import (
 )
 
 type Server struct {
-	log          *slog.Logger
-	from         common.Address
-	signer       bind.SignerFn
-	client       bind.ContractBackend
-	phaseSeconds int
+	log    *slog.Logger
+	from   common.Address
+	signer bind.SignerFn
+	client bind.ContractBackend
 	commitrevealv1.UnimplementedCommitRevealServiceServer
 }
 
@@ -30,14 +28,12 @@ func NewServer(
 	from common.Address,
 	signer bind.SignerFn,
 	client bind.ContractBackend,
-	phaseSeconds int,
 ) *Server {
 	return &Server{
-		log:          log,
-		from:         from,
-		signer:       signer,
-		client:       client,
-		phaseSeconds: phaseSeconds,
+		log:    log,
+		from:   from,
+		signer: signer,
+		client: client,
 	}
 }
 
@@ -52,9 +48,7 @@ func NewHandler(ctx context.Context, s *Server) (http.Handler, error) {
 
 func (s Server) Health(ctx context.Context, _ *commitrevealv1.HealthRequest) (*commitrevealv1.HealthResponse, error) {
 	if _, err := s.client.SuggestGasPrice(ctx); err != nil {
-		return &commitrevealv1.HealthResponse{
-			Ok: false,
-		}, fmt.Errorf("blockchain is not online: %w", err)
+		return nil, fmt.Errorf("blockchain is not online: %w", err)
 	}
 
 	return &commitrevealv1.HealthResponse{
@@ -63,7 +57,7 @@ func (s Server) Health(ctx context.Context, _ *commitrevealv1.HealthRequest) (*c
 }
 
 func (s Server) CreatePoll(ctx context.Context, r *commitrevealv1.CreatePollRequest) (*commitrevealv1.CreatePollResponse, error) {
-	addr, _, _, err := contracts.DeployCommitReveal(s.auth(ctx), s.client, big.NewInt(int64(s.phaseSeconds)), r.GetChoice_1(), r.GetChoice_2())
+	addr, _, _, err := contracts.DeployCommitReveal(s.auth(ctx), s.client, big.NewInt(r.GetSeconds()), r.GetChoice_1(), r.GetChoice_2())
 	if err != nil {
 		return nil, fmt.Errorf("failed to deploy contract: %w", err)
 	}
@@ -83,8 +77,6 @@ func (s Server) GetPoll(ctx context.Context, r *commitrevealv1.GetPollRequest) (
 	if err != nil {
 		return nil, fmt.Errorf("failed to get phase end time: %w", err)
 	}
-
-	commitEndTime := time.Unix(commitEnd.Int64(), 0)
 
 	choice1, err := c.Choice1(s.readAuth(ctx))
 	if err != nil {
@@ -106,8 +98,15 @@ func (s Server) GetPoll(ctx context.Context, r *commitrevealv1.GetPollRequest) (
 		return nil, fmt.Errorf("failed to get choice2 count: %w", err)
 	}
 
+	h, err := s.client.HeaderByNumber(ctx, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get header: %w", err)
+	}
+
+	secondsLeft := commitEnd.Uint64() - h.Time
+
 	return &commitrevealv1.GetPollResponse{
-		SecondsLeft: int64(time.Until(commitEndTime).Seconds()),
+		SecondsLeft: int64(secondsLeft),
 		Choice_1:    choice1,
 		Choice_2:    choice2,
 		Count_1:     votesForChoice1.Int64(),
@@ -118,15 +117,11 @@ func (s Server) GetPoll(ctx context.Context, r *commitrevealv1.GetPollRequest) (
 func (s Server) Commit(ctx context.Context, r *commitrevealv1.CommitRequest) (*commitrevealv1.CommitResponse, error) {
 	c, err := s.contract(r.GetAddress())
 	if err != nil {
-		return &commitrevealv1.CommitResponse{
-			Ok: false,
-		}, fmt.Errorf("failed to find initilise contract bindings: %w", err)
+		return nil, fmt.Errorf("failed to find initilise contract bindings: %w", err)
 	}
 
 	if _, err := c.CommitVote(s.auth(ctx), tools.Keccak256(r.Secret)); err != nil {
-		return &commitrevealv1.CommitResponse{
-			Ok: false,
-		}, fmt.Errorf("failed to commit vote: %w", err)
+		return nil, fmt.Errorf("failed to commit vote: %w", err)
 	}
 
 	return &commitrevealv1.CommitResponse{
@@ -137,15 +132,11 @@ func (s Server) Commit(ctx context.Context, r *commitrevealv1.CommitRequest) (*c
 func (s Server) Reveal(ctx context.Context, r *commitrevealv1.RevealRequest) (*commitrevealv1.RevealResponse, error) {
 	c, err := s.contract(r.GetAddress())
 	if err != nil {
-		return &commitrevealv1.RevealResponse{
-			Ok: false,
-		}, fmt.Errorf("failed to find initilise contract bindings: %w", err)
+		return nil, fmt.Errorf("failed to find initilise contract bindings: %w", err)
 	}
 
 	if _, err := c.RevealVote(s.auth(ctx), r.Secret, tools.Keccak256(r.Secret)); err != nil {
-		return &commitrevealv1.RevealResponse{
-			Ok: false,
-		}, fmt.Errorf("failed to commit vote: %w", err)
+		return nil, fmt.Errorf("failed to commit vote: %w", err)
 	}
 
 	return &commitrevealv1.RevealResponse{

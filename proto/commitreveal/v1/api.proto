@@ -13,6 +13,7 @@ message HealthResponse {
 message CreatePollRequest {
   string choice_1 = 1;
   string choice_2 = 2;
+  int64 seconds = 3;
 }
 
 message CreatePollResponse {

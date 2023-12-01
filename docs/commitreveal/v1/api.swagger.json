@@ -131,6 +131,13 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "seconds",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
           }
         ],
         "tags": [
