@@ -59,7 +59,7 @@ var _ = Describe("Contract test", Label("sol"), func() {
 		Expect(err).NotTo(HaveOccurred())
 		cli.Commit()
 
-		err = cli.AdjustTime(time.Duration(PhaseLengthInSeconds.Int64()) * time.Second)
+		err = cli.AdjustTime(time.Duration(phaseSeconds) * time.Second)
 		Expect(err).NotTo(HaveOccurred())
 		cli.Commit()
 
@@ -86,26 +86,39 @@ var _ = Describe("Contract test", Label("sol"), func() {
 		Expect(voteStatusCommit2).Should(Equal("Revealed"))
 	})
 
-	//   it("should not record an incorrect reveal", async () => {
-	It("should not record an incorrect reveal", func(ctx SpecContext) {})
-	// 	const badVote = "3~mybigsecret";
-	// 	const commit = ethers.encodeBytes32String(badVote);
-	// 	await commitReveal.commitVote(commit);
-	// 	await ethers.provider.send("evm_increaseTime", [PHASE_LENGTH_IN_SECONDS]);
-	// 	const tx = commitReveal.revealVote(badVote, commit);
-	// 	await expect(tx).to.be.rejectedWith(Error);
-	//   });
+	It("should not record an incorrect reveal", func(ctx SpecContext) {
+		const badVote = "3~mybigsecret"
+		_, err := c.CommitVote(auth, b32(badVote))
+		Expect(err).NotTo(HaveOccurred())
+		cli.Commit()
 
-	//   it("should correctly get winner", async () => {
-	It("should correctly get winner", func(ctx SpecContext) {})
-	// 	const vote = "1~mybigsecret";
-	// 	const commit = ethers.keccak256(ethers.toUtf8Bytes(vote));
-	// 	await commitReveal.commitVote(commit);
-	// 	await ethers.provider.send("evm_increaseTime", [PHASE_LENGTH_IN_SECONDS]);
-	// 	await commitReveal.revealVote(vote, commit);
-	// 	const winner = await commitReveal.getWinner();
-	// 	expect(winner).to.equal("YES");
-	//   });
+		err = cli.AdjustTime(time.Duration(phaseSeconds) * time.Second)
+		Expect(err).NotTo(HaveOccurred())
+		cli.Commit()
+
+		tx, err := c.RevealVote(auth, badVote, b32(badVote))
+		Expect(err).To(MatchError("execution reverted: Vote hash does not match vote commit."))
+		Expect(tx).To(BeNil())
+	})
+
+	It("should correctly get winner", func(ctx SpecContext) {
+		const vote = "1~mybigsecret"
+		commit := crypto.Keccak256([]byte(vote))
+		c.CommitVote(auth, [32]byte(commit))
+		cli.Commit()
+
+		err := cli.AdjustTime(time.Duration(phaseSeconds) * time.Second)
+		Expect(err).NotTo(HaveOccurred())
+		cli.Commit()
+
+		_, err = c.RevealVote(auth, vote, [32]byte(commit))
+		Expect(err).NotTo(HaveOccurred())
+		cli.Commit()
+
+		winner, err := c.GetWinner(nil)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(winner).Should(Equal("YES"))
+	})
 })
 
 func b32(s string) [32]byte {
@@ -118,22 +131,22 @@ func unb32(v [32]byte) string {
 	return strings.TrimRight(string(v[:]), "\x00")
 }
 
-func ConvertEthToWei(ethAmount float64) *big.Int {
+func wei(eth float64) *big.Int {
 	weiMultiplier := new(big.Int)
 	weiMultiplier.Exp(big.NewInt(10), big.NewInt(18), nil)
 
-	ethInWei := new(big.Float).Mul(big.NewFloat(ethAmount), new(big.Float).SetInt(weiMultiplier))
+	ethInWei := new(big.Float).Mul(big.NewFloat(eth), new(big.Float).SetInt(weiMultiplier))
 	wei := new(big.Int)
 	ethInWei.Int(wei)
 
 	return wei
 }
 
-var PhaseLengthInSeconds = big.NewInt(120)
-
 const (
 	simChainID = 1337
 	gasLim     = 4712388
+
+	phaseSeconds = 120
 )
 
 func testContract() (*bind.TransactOpts, *backends.SimulatedBackend, *CommitReveal, error) {
@@ -146,10 +159,10 @@ func testContract() (*bind.TransactOpts, *backends.SimulatedBackend, *CommitReve
 		return nil, nil, nil, fmt.Errorf("failed to create transactor: %w", err)
 	}
 	alloc := make(core.GenesisAlloc)
-	alloc[auth.From] = core.GenesisAccount{Balance: ConvertEthToWei(1000)}
+	alloc[auth.From] = core.GenesisAccount{Balance: wei(1000)}
 	client := backends.NewSimulatedBackend(alloc, gasLim)
 
-	_, _, contract, err := DeployCommitReveal(auth, client, PhaseLengthInSeconds, "YES", "NO")
+	_, _, contract, err := DeployCommitReveal(auth, client, big.NewInt(phaseSeconds), "YES", "NO")
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to deploy contract: %w", err)
 	}
