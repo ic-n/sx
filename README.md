@@ -1,10 +1,40 @@
 # Web3 Engineering Assignment
 
-Thank you for your interest in joining the SX engineering team!
+## Usage
 
-This document is just a quick test to see where your coding and problem solving skills are with something related to dApp development. It’s designed to be straightforward and not take too much of your time.
+This application is solution for Web3 Engineering Assignment.
 
-Since a lot of this position will involve integrating with Solidity contracts, we've created a task that, in some capacity, represents the tooling you'll be working with on a day-to-day basis with us.
+The solution is in folder [solution](./solution/). Inside folder there a golang solution for assignment:
+- documention for service API [api/commitreveal/v1/api.swagger.json](./solution/api/commitreveal/v1/api.swagger.json)
+- entrypoint for go server [cmd/server/main.go](./solution/cmd/server/main.go)
+- docker image [deploy/commitreveal.dockerfile](./solution/deploy/commitreveal.dockerfile)
+- k8s (helm) configuration [solution/deploy](./solution/deploy),[deploy/templates/deployment.yaml], (./solution/deploy/templates/deployment.yaml)
+- GRPC API implementation [pkg/api/api.go](./solution/pkg/api/api.go)
+- Contract bindings for Go [pkg/contracts/commit_reveal.go](./solution/pkg/contracts/commit_reveal.go)
+- Implementation of [JS test](./test/CommitReveal.test.ts) in Go using popular BDD framework [pkg/contracts/commit_reveal_test.go](./solution/pkg/contracts/commit_reveal_test.go)
+- GRPC/GRPC-HTTP-Gateway protobuf definitions [proto/commitreveal/v1/api.proto](./solution/proto/commitreveal/v1/api.proto)
+- GRPC configurations [buf.gen.yaml](./solution/buf.gen.yaml)
+- Taskfile (like makefile) [Taskfile.yaml](./solution/Taskfile.yaml)
+
+### Commands
+
+Before you begin, make sure you have the following prerequisites:
+
+- Task runner installed (https://taskfile.dev/installation/)
+- Docker installed to build and package the service.
+- Helm (https://helm.sh/) installed for Kubernetes deployment and management.
+- kubectl (Kubernetes command-line tool) configured to interact with your Kubernetes cluster.
+- Go for development installed (https://go.dev/doc/install)
+- Buf for managing protobuf files installed (https://buf.build/docs/installation)
+
+From `solution` directory:
++ `task build` will build application image and chart and store it at ./build
++ `task deploy` will install or upgrade helm deployment, requires to run `task build` first
++ `task logs` will show logs of running helm deployment, requires to run `task deploy` first
++ `task port-forward` will port forward to service of running helm deployment, reachable at http://127.0.0.1:8080, requires to run `task deploy` first
++ `task clean` will perform clean up, remove helm deployment and build artefacts
++ `task gen` will generate abi and bin for solidity contract, generate Go contract bindings, generate protobuf bindings for go, generate open API files
++ `task dev-mac` will install all dev requirements (macOS/linux-homebrew only supported)
 
 ## Background
 
