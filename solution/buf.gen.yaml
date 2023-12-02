@@ -18,4 +18,4 @@ plugins:
       - paths=source_relative
       - generate_unbound_methods=true
   - plugin: buf.build/grpc-ecosystem/openapiv2:v2.18.0
-    out: docs
+    out: api

@@ -56,9 +56,9 @@ tasks:
 
   gen:
     cmds:
-      - solc --evm-version paris --abi --bin ./contracts/CommitReveal.sol -o build --overwrite
+      - solc --evm-version paris --abi --bin ../contracts/CommitReveal.sol -o build --overwrite
       - >
-        abigen --out ./contracts/commit_reveal.go
+        abigen --out ./pkg/contracts/commit_reveal.go
         --abi ./build/CommitReveal.abi
         --bin=./build/CommitReveal.bin
         --pkg contracts

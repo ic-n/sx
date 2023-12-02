@@ -10,8 +10,8 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/ic-n/sx/contracts"
 	commitrevealv1 "github.com/ic-n/sx/pkg/api/gen/commitreveal/v1"
+	"github.com/ic-n/sx/pkg/contracts"
 	"github.com/ic-n/sx/pkg/tools"
 )
 
