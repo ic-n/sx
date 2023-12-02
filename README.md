@@ -8,7 +8,7 @@ The solution is in folder [solution](./solution/). Inside folder there a golang 
 - documention for service API [api/commitreveal/v1/api.swagger.json](./solution/api/commitreveal/v1/api.swagger.json)
 - entrypoint for go server [cmd/server/main.go](./solution/cmd/server/main.go)
 - docker image [deploy/commitreveal.dockerfile](./solution/deploy/commitreveal.dockerfile)
-- k8s (helm) configuration [solution/deploy](./solution/deploy),[deploy/templates/deployment.yaml], (./solution/deploy/templates/deployment.yaml)
+- k8s (helm) configuration [solution/deploy](./solution/deploy),[deploy/templates/deployment.yaml](./solution/deploy/templates/deployment.yaml)
 - GRPC API implementation [pkg/api/api.go](./solution/pkg/api/api.go)
 - Contract bindings for Go [pkg/contracts/commit_reveal.go](./solution/pkg/contracts/commit_reveal.go)
 - Implementation of [JS test](./test/CommitReveal.test.ts) in Go using popular BDD framework [pkg/contracts/commit_reveal_test.go](./solution/pkg/contracts/commit_reveal_test.go)
