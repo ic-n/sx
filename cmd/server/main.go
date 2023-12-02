@@ -50,7 +50,10 @@ func main() {
 	s := http.Server{
 		Addr: ":80",
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			defer client.Commit()
+			if r.Method == http.MethodPost {
+				defer client.Commit()
+			}
+
 			h.ServeHTTP(w, r)
 		}),
 		ReadTimeout:       time.Second * 30,

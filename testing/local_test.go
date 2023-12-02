@@ -1,11 +1,11 @@
 package testing
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"testing"
-	"time"
 
 	commitrevealv1 "github.com/ic-n/sx/pkg/api/gen/commitreveal/v1"
 	"github.com/stretchr/testify/require"
@@ -22,7 +22,7 @@ func TestAPI(t *testing.T) {
 		resp, err := c.PostForm(base+"/v1/poll", url.Values{
 			"choice_1": []string{"Yes"},
 			"choice_2": []string{"No"},
-			"seconds":  []string{"2"},
+			"seconds":  []string{"30"},
 		})
 		require.NoError(t, err)
 
@@ -51,22 +51,18 @@ func TestAPI(t *testing.T) {
 	require.Equal(t, "No", poll.Choice_2)
 	require.Greater(t, poll.SecondsLeft, int64(0))
 
-	{
-		_, err := c.PostForm(base+"/v1/commit", url.Values{
+	for i := 0; i < 9; i++ {
+		resp, err := c.PostForm(base+"/v1/commit", url.Values{
 			"address": []string{newPoll.GetAddress()},
-			"secret":  []string{"1~test"},
+			"secret":  []string{fmt.Sprintf("%d~test%d", i%2+1, i)},
 		})
-		require.NoError(t, err)
-	}
-	{
-		_, err := c.PostForm(base+"/v1/commit", url.Values{
-			"address": []string{newPoll.GetAddress()},
-			"secret":  []string{"0~test"},
-		})
+		if resp.StatusCode == http.StatusBadRequest {
+			break
+		}
+		require.Equal(t, http.StatusOK, resp.StatusCode)
 		require.NoError(t, err)
 	}
 
-	time.Sleep(2 * time.Second)
 	{
 		resp, err := c.Get(base + "/v1/poll?address=" + newPoll.GetAddress())
 		require.NoError(t, err)
@@ -81,4 +77,33 @@ func TestAPI(t *testing.T) {
 	require.Equal(t, "Yes", poll.Choice_1)
 	require.Equal(t, "No", poll.Choice_2)
 	require.Equal(t, int64(0), poll.SecondsLeft)
+
+	for i := 0; i < 9; i++ {
+		resp, err := c.PostForm(base+"/v1/reveal", url.Values{
+			"address": []string{newPoll.GetAddress()},
+			"secret":  []string{fmt.Sprintf("%d~test%d", i%2+1, i)},
+		})
+		if resp.StatusCode == http.StatusBadRequest {
+			break
+		}
+		require.Equal(t, http.StatusOK, resp.StatusCode)
+		require.NoError(t, err)
+	}
+
+	{
+		resp, err := c.Get(base + "/v1/poll?address=" + newPoll.GetAddress())
+		require.NoError(t, err)
+
+		b, err := io.ReadAll(resp.Body)
+		require.NoError(t, err)
+		resp.Body.Close()
+
+		err = protojson.Unmarshal(b, &poll)
+		require.NoError(t, err, string(b))
+	}
+	require.Equal(t, "Yes", poll.Choice_1)
+	require.Equal(t, "No", poll.Choice_2)
+	require.EqualValues(t, 0, poll.SecondsLeft)
+	require.Greater(t, poll.Count_1, int64(0))
+	require.Greater(t, poll.Count_2, int64(0))
 }
