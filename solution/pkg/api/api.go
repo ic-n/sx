@@ -17,22 +17,19 @@ import (
 
 type Server struct {
 	log    *slog.Logger
-	from   common.Address
-	signer bind.SignerFn
+	auth   *bind.TransactOpts
 	client bind.ContractBackend
 	commitrevealv1.UnimplementedCommitRevealServiceServer
 }
 
 func NewServer(
 	log *slog.Logger,
-	from common.Address,
-	signer bind.SignerFn,
+	auth *bind.TransactOpts,
 	client bind.ContractBackend,
 ) *Server {
 	return &Server{
 		log:    log,
-		from:   from,
-		signer: signer,
+		auth:   auth,
 		client: client,
 	}
 }
@@ -59,7 +56,7 @@ func (s Server) Health(ctx context.Context, _ *commitrevealv1.HealthRequest) (*c
 }
 
 func (s Server) CreatePoll(ctx context.Context, r *commitrevealv1.CreatePollRequest) (*commitrevealv1.CreatePollResponse, error) {
-	addr, _, _, err := contracts.DeployCommitReveal(s.auth(ctx), s.client, big.NewInt(r.GetSeconds()), r.GetChoice_1(), r.GetChoice_2())
+	addr, _, _, err := contracts.DeployCommitReveal(s.writeAuth(ctx), s.client, big.NewInt(r.GetSeconds()), r.GetChoice_1(), r.GetChoice_2())
 	if err != nil {
 		err = fmt.Errorf("failed to deploy contract: %w", err)
 		s.log.Warn(err.Error())
@@ -138,7 +135,7 @@ func (s Server) Commit(ctx context.Context, r *commitrevealv1.CommitRequest) (*c
 		return nil, err
 	}
 
-	if _, err := c.CommitVote(s.auth(ctx), tools.Keccak256(r.Secret)); err != nil {
+	if _, err := c.CommitVote(s.writeAuth(ctx), tools.Keccak256(r.Secret)); err != nil {
 		err = fmt.Errorf("failed to commit vote: %w", err)
 		s.log.Warn(err.Error())
 		return nil, &runtime.HTTPStatusError{
@@ -160,7 +157,7 @@ func (s Server) Reveal(ctx context.Context, r *commitrevealv1.RevealRequest) (*c
 		return nil, err
 	}
 
-	if _, err := c.RevealVote(s.auth(ctx), r.Secret, tools.Keccak256(r.Secret)); err != nil {
+	if _, err := c.RevealVote(s.writeAuth(ctx), r.Secret, tools.Keccak256(r.Secret)); err != nil {
 		err = fmt.Errorf("failed to reveal vote: %w", err)
 		s.log.Warn(err.Error())
 		return nil, &runtime.HTTPStatusError{
@@ -174,17 +171,25 @@ func (s Server) Reveal(ctx context.Context, r *commitrevealv1.RevealRequest) (*c
 	}, nil
 }
 
-func (s Server) auth(ctx context.Context) *bind.TransactOpts {
+func (s Server) writeAuth(ctx context.Context) *bind.TransactOpts {
 	return &bind.TransactOpts{
-		From:    s.from,
-		Signer:  s.signer,
-		Context: ctx,
+		From:      s.auth.From,
+		Nonce:     s.auth.Nonce,
+		Signer:    s.auth.Signer,
+		Value:     common.Big0,
+		GasPrice:  s.auth.GasPrice,
+		GasFeeCap: s.auth.GasFeeCap,
+		GasTipCap: s.auth.GasTipCap,
+		GasLimit:  s.auth.GasLimit,
+		Context:   ctx,
+		NoSend:    s.auth.NoSend,
 	}
 }
 
 func (s Server) readAuth(ctx context.Context) *bind.CallOpts {
 	return &bind.CallOpts{
-		From:    s.from,
+		Pending: true,
+		From:    s.auth.From,
 		Context: ctx,
 	}
 }

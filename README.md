@@ -36,6 +36,15 @@ From `solution` directory:
 + `task gen` will generate abi and bin for solidity contract, generate Go contract bindings, generate protobuf bindings for go, generate open API files
 + `task dev-mac` will install all dev requirements (macOS/linux-homebrew only supported)
 
+### Testing
+
+To perform integrational test you need to have blockchain running, server running, and then test it via HTTP calls
+
+1. Open three terminal windows in `./solution` folder
+1. Run `task testnet` in first, to run local etherium node API
+1. Run `task local-run` (local) or `task build deploy && sleep 1 && task port-forward` (local k8s) in second, to run server at localhost:80
+1. Run `go test -timeout 30s -count 1 -run ^TestAPI$ ./testing -v` in third, to run [test](./solution/testing/local_test.go)
+
 ## Background
 
 "Blind" voting on a public blockchain takes some thought. All data is public so without any extra tricks it's trivial to see who voted what and which side is likely to win. This can greatly bias voters and lead to inefficient decisions.

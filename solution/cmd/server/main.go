@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"crypto/ecdsa"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -12,7 +11,6 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ic-n/sx/pkg/api"
 	"github.com/ic-n/sx/pkg/tools"
@@ -65,17 +63,14 @@ func App(cctx *cli.Context) error {
 		pk = pk2
 	}
 
-	publicKey := pk.Public()
-	publicKeyECDSA, _ := publicKey.(*ecdsa.PublicKey)
-	address := crypto.PubkeyToAddress(*publicKeyECDSA)
-	log.InfoContext(ctx, "eth wallet connected", "address", address)
-
 	auth, err := bind.NewKeyedTransactorWithChainID(pk, big.NewInt(chainID.Get(cctx)))
 	if err != nil {
 		return fmt.Errorf("failed to create keyed transactor: %w", err)
 	}
 
-	h, err := api.NewHandler(ctx, api.NewServer(log, auth.From, auth.Signer, client))
+	log.InfoContext(ctx, "eth wallet connected", "address", auth.From.Hex())
+
+	h, err := api.NewHandler(ctx, api.NewServer(log, auth, client))
 	if err != nil {
 		return fmt.Errorf("failed to create server handler: %w", err)
 	}
@@ -88,6 +83,7 @@ func App(cctx *cli.Context) error {
 		ReadTimeout:       time.Second * 30,
 		ReadHeaderTimeout: time.Second * 5,
 	}
+	log.InfoContext(ctx, "server started", "addr", s.Addr)
 	if err := s.ListenAndServe(); err != nil {
 		return fmt.Errorf("failed to serve: %w", err)
 	}

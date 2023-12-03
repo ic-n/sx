@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"testing"
+	"time"
 
 	commitrevealv1 "github.com/ic-n/sx/pkg/api/gen/commitreveal/v1"
 	"github.com/stretchr/testify/require"
@@ -17,12 +18,24 @@ const base = "http://127.0.0.1:80"
 func TestAPI(t *testing.T) {
 	c := http.Client{}
 
+	resp, err := c.Get(base + "/v1/health")
+	if err != nil {
+		t.Logf("skipping: %s", err.Error())
+		t.Skip()
+		return
+	}
+	if resp.StatusCode != http.StatusOK {
+		t.Logf("skipping: HTTP Status %s", resp.Status)
+		t.Skip()
+		return
+	}
+
 	var newPoll commitrevealv1.CreatePollResponse
 	{
 		resp, err := c.PostForm(base+"/v1/poll", url.Values{
 			"choice_1": []string{"Yes"},
 			"choice_2": []string{"No"},
-			"seconds":  []string{"30"},
+			"seconds":  []string{"5"},
 		})
 		require.NoError(t, err)
 
@@ -34,6 +47,8 @@ func TestAPI(t *testing.T) {
 		require.NoError(t, err, string(b))
 	}
 	require.NotEmpty(t, newPoll.Address)
+
+	<-time.After(time.Second)
 
 	var poll commitrevealv1.GetPollResponse
 	{
@@ -49,7 +64,7 @@ func TestAPI(t *testing.T) {
 	}
 	require.Equal(t, "Yes", poll.Choice_1)
 	require.Equal(t, "No", poll.Choice_2)
-	require.Greater(t, poll.SecondsLeft, int64(0))
+	require.GreaterOrEqual(t, poll.SecondsLeft, int64(4))
 
 	for i := 0; i < 9; i++ {
 		resp, err := c.PostForm(base+"/v1/commit", url.Values{
@@ -62,6 +77,8 @@ func TestAPI(t *testing.T) {
 		require.Equal(t, http.StatusOK, resp.StatusCode)
 		require.NoError(t, err)
 	}
+
+	<-time.After(time.Second * 4)
 
 	{
 		resp, err := c.Get(base + "/v1/poll?address=" + newPoll.GetAddress())
@@ -101,6 +118,7 @@ func TestAPI(t *testing.T) {
 		err = protojson.Unmarshal(b, &poll)
 		require.NoError(t, err, string(b))
 	}
+
 	require.Equal(t, "Yes", poll.Choice_1)
 	require.Equal(t, "No", poll.Choice_2)
 	require.EqualValues(t, 0, poll.SecondsLeft)

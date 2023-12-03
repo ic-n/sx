@@ -72,16 +72,14 @@ tasks:
 
   testnet:
     cmds:
+      - echo -n 1 > /tmp/testnet-sx-assignment-pw.txt
       - >
         geth
+        --verbosity 6
         --identity "sx-assignment"
-        --datadir /tmp/testnet-sx-assignment
-        --metrics
-        init ./testing/genesis.json
-      - >
-        geth
-        --identity "sx-assignment"
-        --datadir /tmp/testnet-sx-assipnment
+        --http --http.api web3,eth,debug,personal,net
+        --dev --password /tmp/testnet-sx-assignment-pw.txt
+        --keystore ./testing/data/keystore
         --metrics
         console
     interactive: true
@@ -90,9 +88,9 @@ tasks:
     cmds:
       - >
         go run cmd/server/main.go
-        -net-url "http://127.0.0.1:8551"
+        -net-url "http://127.0.0.1:8545"
         -private-key b16ce2c80305a43733733c7057c6515d1c1c34e3cfa71208898dcd1457b84b7e
-        -chain-id 5
+        -chain-id 1337
 
   dev-buf-mod:
     dir: ./proto
