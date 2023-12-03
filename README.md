@@ -38,6 +38,8 @@ From `solution` directory:
 
 ### Testing
 
+Test on emulated backend done by [CI/CD](https://github.com/ic-n/sx/actions/runs/7079125577) or you can run `go test -timeout 30s -v ./...` from ./solution folder
+
 To perform integrational test you need to have blockchain running, server running, and then test it via HTTP calls
 
 1. Open three terminal windows in `./solution` folder
