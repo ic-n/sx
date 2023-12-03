@@ -14,7 +14,8 @@ tasks:
 
   uninstall:
     cmds:
-      - helm uninstall commitreveal
+      - cmd: helm uninstall commitreveal
+        ignore_error: true
 
   deploy:
     cmds:
@@ -53,6 +54,7 @@ tasks:
     cmds:
       - task: uninstall
       - rm -rf build
+      - rm -rf /tmp/testnet-sx-assignment
 
   gen:
     cmds:
@@ -67,6 +69,30 @@ tasks:
       - buf lint proto
       - buf generate
       - go mod tidy
+
+  testnet:
+    cmds:
+      - >
+        geth
+        --identity "sx-assignment"
+        --datadir /tmp/testnet-sx-assignment
+        --metrics
+        init ./testing/genesis.json
+      - >
+        geth
+        --identity "sx-assignment"
+        --datadir /tmp/testnet-sx-assipnment
+        --metrics
+        console
+    interactive: true
+
+  local-run:
+    cmds:
+      - >
+        go run cmd/server/main.go
+        -net-url "http://127.0.0.1:8551"
+        -private-key b16ce2c80305a43733733c7057c6515d1c1c34e3cfa71208898dcd1457b84b7e
+        -chain-id 5
 
   dev-buf-mod:
     dir: ./proto
