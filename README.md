@@ -29,7 +29,7 @@ Before you begin, make sure you have the following prerequisites:
 
 From `solution` directory:
 + `task build` will build application image and chart and store it at ./build
-+ `task deploy` will install or upgrade helm deployment, requires to run `task build` first
++ `task deploy` will install or upgrade helm deployment, requires to run `task build` first (be sure that values [solution/deploy/values/default.yaml](./solution/deploy/values/default.yaml) are correctly populated, and extended for production enviroment)
 + `task logs` will show logs of running helm deployment, requires to run `task deploy` first
 + `task port-forward` will port forward to service of running helm deployment, reachable at http://127.0.0.1:8080, requires to run `task deploy` first
 + `task clean` will perform clean up, remove helm deployment and build artefacts
@@ -44,7 +44,7 @@ To perform integrational test you need to have blockchain running, server runnin
 
 1. Open three terminal windows in `./solution` folder
 1. Run `task testnet` in first, to run local etherium node API
-1. Run `task local-run` (local) or `task build deploy && sleep 1 && task port-forward` (local k8s) in second, to run server at localhost:80
+1. Run `task local-run` in second, to run server at localhost:80
 1. Run `go test -timeout 30s -count 1 -run ^TestAPI$ ./testing -v` in third, to run [test](./solution/testing/local_test.go)
 
 ## Background

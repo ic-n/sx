@@ -1,5 +1,5 @@
 netURL: https://mainnet.infura.io  # https://ethereum.publicnode.com
-# privateKey: /var/...
+privateKey: /var/...
 chainId: 1
 
 resources:

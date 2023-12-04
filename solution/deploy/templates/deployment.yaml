@@ -35,11 +35,11 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: NET_URL
-              value: {{ .Values.netURL }}
+              value: {{ quote .Values.netURL }}
             - name: PRIVATE_KEY
-              value: {{ .Values.privateKey }}
+              value: {{ quote .Values.privateKey }}
             - name: CHAIN_ID
-              value: {{ .Values.chainId }}
+              value: {{ quote .Values.chainId }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
